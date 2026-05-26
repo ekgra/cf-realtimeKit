@@ -87,3 +87,9 @@ Current state:
 - Change: Implemented join existing meeting happy path locally. Added path/body validation for `POST /api/meetings/:meetingId/join`, Worker-only RealtimeKit participant creation for a caller-provided meeting ID, frontend join form state, and issue-specific join sequence documentation. No D1 persistence or meeting lookup was introduced.
 - Files: apps/worker/src/schemas/meetings.ts; apps/worker/src/schemas.test.ts; apps/worker/src/services/realtimekit.ts; apps/worker/src/services/realtimekit.test.ts; apps/worker/src/app.ts; apps/worker/src/app.test.ts; apps/web/src/App.tsx; apps/web/src/styles.css; README.md; docs/diagrams/issues/5-sequence.puml; docs/diagrams/issues/5-sequence.svg; context/compact-delta.md
 - Validation: Worker schema/service/route tests passed with 30 tests; workspace typecheck/build passed; Wrangler dry-run passed; secret scans passed; issue #5 sequence diagram rendered; dev-local create-then-join smoke passed with auth tokens redacted. No staging or production deploy performed.
+
+## 2026-05-27 04:15 AEST
+- Issue: #4
+- Change: Added the missing issue-specific create-meeting sequence diagram that should have accompanied issue #4, and linked it from README.
+- Files: docs/diagrams/issues/4-sequence.puml; docs/diagrams/issues/4-sequence.svg; README.md; context/compact-delta.md
+- Validation: `plantuml -tsvg docs/diagrams/issues/4-sequence.puml` passed.

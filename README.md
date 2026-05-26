@@ -79,6 +79,8 @@ corepack pnpm --filter @cf-realtimekit-demo/web dev
 - Architecture diagram SVG: [docs/diagrams/architecture.svg](docs/diagrams/architecture.svg)
 - Main sequence source: [docs/diagrams/sequences/main-flow.puml](docs/diagrams/sequences/main-flow.puml)
 - Main sequence SVG: [docs/diagrams/sequences/main-flow.svg](docs/diagrams/sequences/main-flow.svg)
+- Issue #4 create sequence source: [docs/diagrams/issues/4-sequence.puml](docs/diagrams/issues/4-sequence.puml)
+- Issue #4 create sequence SVG: [docs/diagrams/issues/4-sequence.svg](docs/diagrams/issues/4-sequence.svg)
 - Issue #5 join sequence source: [docs/diagrams/issues/5-sequence.puml](docs/diagrams/issues/5-sequence.puml)
 - Issue #5 join sequence SVG: [docs/diagrams/issues/5-sequence.svg](docs/diagrams/issues/5-sequence.svg)
 - ADRs: [docs/adr/](docs/adr/)

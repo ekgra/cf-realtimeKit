@@ -1,0 +1,22 @@
+@startuml
+title Issue #4 Create Meeting Flow
+
+actor "Creator" as User
+participant "React/Vite frontend" as Frontend
+participant "Hono Worker API" as Worker
+participant "Cloudflare RealtimeKit API" as RealtimeKit
+participant "Workers Observability" as Observability
+
+User -> Frontend: Enter display name and optional title
+Frontend -> Worker: POST /api/meetings
+Worker -> Worker: Validate request body and Worker env
+Worker -> RealtimeKit: Create meeting
+RealtimeKit --> Worker: meeting ID
+Worker -> RealtimeKit: Add creator participant with REALTIMEKIT_PRESET_NAME
+RealtimeKit --> Worker: participant token
+Worker -> Observability: Structured create/request failure logs
+Worker --> Frontend: meetingId, authToken
+Frontend -> RealtimeKit: Initialize SDK with authToken
+Frontend --> User: Render RtkMeeting
+
+@enduml
