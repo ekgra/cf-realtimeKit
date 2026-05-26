@@ -4,11 +4,14 @@
   "version": "0.0.0",
   "packageManager": "pnpm@9.15.4",
   "scripts": {
+    "build:web": "pnpm --filter @cf-realtimekit-demo/web build",
     "build": "pnpm -r --if-present build",
+    "dev:worker": "pnpm build:web && wrangler dev --local",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.50.0"
   }
 }
