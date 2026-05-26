@@ -33,3 +33,9 @@ Current state:
 - Change: Added package-level Worker dev scripts so `pnpm --filter @cf-realtimekit-demo/worker dev` and `pnpm --filter @cf-realtimekit-demo/worker dev:worker` work from the repo root.
 - Files: apps/worker/package.json; issue3-slices-runbook.md; context/compact-delta.md
 - Validation: Filtered Worker dev command started Wrangler local dev and served `/health` plus frontend assets; Worker typecheck and test passed.
+
+## 2026-05-27 01:48 AEST
+- Issue: #3 / local slice 3E
+- Change: Added `.env.example` with placeholder V1 config and documented the secret boundary. `CLOUDFLARE_API_TOKEN` is Worker/server-only; browser-exposed env prefixes such as `VITE_` must not be used for it. Local env files and Wrangler `.dev.vars` files are ignored.
+- Files: .env.example; .gitignore; README.md; issue3-slices-runbook.md; context/compact-delta.md
+- Validation: Frontend token/RealtimeKit secret scan passed; `.env.example` placeholder check passed; web and Worker typechecks passed.

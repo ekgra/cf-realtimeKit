@@ -84,17 +84,17 @@ Do not use bare `wrangler deploy` unless future repo docs or scripts explicitly 
 
 ## Configuration
 
-The MVP requires these environment variables:
+The scaffold includes [.env.example](.env.example) with placeholder values only. The MVP requires these environment variables:
 
-- `CLOUDFLARE_ACCOUNT_ID`
-- `REALTIMEKIT_APP_ID`
-- `REALTIMEKIT_PRESET_NAME`
-- `CLOUDFLARE_API_TOKEN`
-- `PUBLIC_BASE_URL`
+- `CLOUDFLARE_ACCOUNT_ID`: Worker/server-side Cloudflare account identifier for RealtimeKit REST API paths.
+- `REALTIMEKIT_APP_ID`: Worker/server-side RealtimeKit app identifier.
+- `REALTIMEKIT_PRESET_NAME`: Worker/server-side participant preset name used when creating participants.
+- `CLOUDFLARE_API_TOKEN`: Worker/server-only token for Cloudflare REST API calls.
+- `PUBLIC_BASE_URL`: public app origin used for callback URLs such as webhook registration.
 
-`CLOUDFLARE_API_TOKEN` must remain server-side. Browser code must not read it, bundle it, log it, or receive it in API responses.
+`CLOUDFLARE_API_TOKEN` must remain server-side. Browser code must not read it, bundle it, log it, or receive it in API responses. Do not add it with browser-exposed prefixes such as `VITE_`.
 
-Wrangler config and `.env.example` will be added with the app scaffold.
+For local Worker development, use untracked local secret files such as `.dev.vars` or shell-provided environment variables. For deployed environments, use Cloudflare Worker secrets/vars rather than committing real values.
 
 ## Development
 

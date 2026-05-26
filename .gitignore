@@ -5,3 +5,8 @@ node_modules/
 dist/
 *.tsbuildinfo
 .wrangler/
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
