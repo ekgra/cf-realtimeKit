@@ -22,6 +22,7 @@ Runtime commands will be added when the pnpm workspace, Vite app, Hono Worker, a
 ## Documentation Map
 
 - MVP PRD: [docs/specs/mvp/PRD.md](docs/specs/mvp/PRD.md)
+- RealtimeKit implementation notes: [docs/realtimekit-notes.md](docs/realtimekit-notes.md)
 - Architecture diagram source: [docs/diagrams/architecture.d2](docs/diagrams/architecture.d2)
 - Architecture diagram SVG: [docs/diagrams/architecture.svg](docs/diagrams/architecture.svg)
 - Main sequence source: [docs/diagrams/sequences/main-flow.puml](docs/diagrams/sequences/main-flow.puml)
@@ -31,7 +32,6 @@ Runtime commands will be added when the pnpm workspace, Vite app, Hono Worker, a
 
 Planned documentation:
 
-- RealtimeKit notes: `docs/realtimekit-notes.md`
 - Environment and webhook registration instructions
 - Slice evidence on the corresponding GitHub issues
 
