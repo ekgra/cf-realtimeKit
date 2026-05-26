@@ -1,0 +1,35 @@
+@startuml
+title Cloudflare RealtimeKit Demo Main Flow
+
+actor User
+participant "React/Vite frontend" as Frontend
+participant "Hono Worker API" as Worker
+participant "Cloudflare RealtimeKit API" as RealtimeKit
+participant "Workers Observability" as Observability
+
+== Create meeting ==
+User -> Frontend: Enter display name and optional title
+Frontend -> Worker: POST /api/meetings
+Worker -> RealtimeKit: Create meeting
+RealtimeKit --> Worker: meetingId
+Worker -> RealtimeKit: Add participant with preset
+RealtimeKit --> Worker: participant auth token
+Worker --> Frontend: meetingId, authToken
+Frontend -> RealtimeKit: Initialize SDK with authToken
+Frontend --> User: Render RtkMeeting
+
+== Join meeting ==
+User -> Frontend: Enter display name and meetingId
+Frontend -> Worker: POST /api/meetings/{meetingId}/join
+Worker -> RealtimeKit: Add participant with preset
+RealtimeKit --> Worker: participant auth token
+Worker --> Frontend: meetingId, authToken
+Frontend -> RealtimeKit: Initialize SDK with authToken
+Frontend --> User: Render RtkMeeting
+
+== Webhook ==
+RealtimeKit -> Worker: POST /api/realtimekit/webhook
+Worker -> Observability: Structured event log
+Worker --> RealtimeKit: 2xx accepted
+
+@enduml

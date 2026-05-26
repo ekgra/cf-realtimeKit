@@ -1,0 +1,42 @@
+title: Cloudflare RealtimeKit Demo Architecture
+
+direction: right
+
+user: "User browser" {
+  shape: person
+}
+
+worker: "Cloudflare Worker app" {
+  hono: "Hono API routes\n/health\n/api/meetings\n/api/meetings/:meetingId/join\n/api/realtimekit/webhook"
+  assets: "Built React/Vite assets"
+  logs: "Structured logs\n(no token logging)"
+}
+
+realtimekit: "Cloudflare RealtimeKit" {
+  api: "RealtimeKit REST API\nMeetings + Participants"
+  sdk: "RealtimeKit client session"
+  webhooks: "Webhook delivery\nmeeting.ended"
+}
+
+config: "Worker secrets / vars" {
+  account: "CLOUDFLARE_ACCOUNT_ID"
+  app: "REALTIMEKIT_APP_ID"
+  preset: "REALTIMEKIT_PRESET_NAME"
+  token: "CLOUDFLARE_API_TOKEN"
+  base: "PUBLIC_BASE_URL"
+}
+
+observability: "Cloudflare platform observability" {
+  worker_logs: "Workers logs / metrics / traces"
+}
+
+user -> worker.assets: "Load app"
+user -> worker.hono: "Create or join meeting"
+worker.hono -> config: "Read server-side config"
+worker.hono -> realtimekit.api: "Create meeting / participant\nBearer CLOUDFLARE_API_TOKEN"
+realtimekit.api -> worker.hono: "meetingId + participant auth token"
+worker.hono -> user: "Safe response:\nmeetingId + authToken"
+user -> realtimekit.sdk: "Join with participant auth token"
+realtimekit.webhooks -> worker.hono: "POST webhook event"
+worker.hono -> worker.logs: "Log safe lifecycle metadata"
+worker.logs -> observability.worker_logs: "Platform visibility"
