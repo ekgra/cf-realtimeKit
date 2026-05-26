@@ -29,12 +29,21 @@ select {
 .app-shell {
   display: grid;
   min-height: 100vh;
-  place-items: center;
-  padding: 32px;
+  align-items: center;
+  padding: 24px;
 }
 
-.intro {
-  width: min(100%, 720px);
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1fr);
+  gap: 32px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  align-items: start;
+}
+
+.summary {
+  padding-top: 12px;
 }
 
 .eyebrow {
@@ -49,14 +58,137 @@ select {
 h1 {
   margin: 0;
   color: #0d1424;
-  font-size: clamp(2rem, 6vw, 4.5rem);
-  line-height: 1;
+  font-size: 3rem;
+  line-height: 1.05;
   letter-spacing: 0;
 }
 
-.intro p:last-child {
+.summary p:last-child {
   max-width: 56ch;
   margin: 20px 0 0;
   color: #4e5b73;
   font-size: 1.125rem;
+}
+
+.meeting-form {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  padding: 24px;
+  border: 1px solid #d8deea;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgb(21 31 51 / 8%);
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: #28344a;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #c4ccda;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #111827;
+  background: #ffffff;
+}
+
+.field input:focus {
+  border-color: #2367c7;
+  outline: 3px solid rgb(35 103 199 / 18%);
+}
+
+.field input:disabled {
+  color: #637083;
+  background: #f2f4f8;
+}
+
+.primary-action {
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 18px;
+  color: #ffffff;
+  background: #2367c7;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.primary-action:disabled {
+  background: #8aa7cf;
+  cursor: wait;
+}
+
+.status {
+  grid-column: 2;
+  margin: 0;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-weight: 700;
+}
+
+.status-error {
+  color: #7c1d1d;
+  background: #fee2e2;
+}
+
+.meeting-result {
+  grid-column: 2;
+  display: grid;
+  gap: 10px;
+  border: 1px solid #badbcc;
+  border-radius: 8px;
+  padding: 18px;
+  background: #f0fdf4;
+  color: #17452d;
+}
+
+.meeting-result div {
+  display: grid;
+  gap: 4px;
+}
+
+.meeting-result span {
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.meeting-result strong {
+  overflow-wrap: anywhere;
+  color: #0f2f20;
+  font-size: 1rem;
+}
+
+.meeting-result p {
+  margin: 0;
+  color: #2f6849;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    align-items: start;
+    padding: 20px;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+  }
+
+  .meeting-form,
+  .status,
+  .meeting-result {
+    grid-column: 1;
+  }
 }

@@ -63,3 +63,9 @@ Current state:
 - Change: Added `POST /api/meetings` Hono route. The route validates JSON/body and Worker env, calls the RealtimeKit wrapper, returns only `{ meetingId, authToken }`, and uses safe errors for invalid input, config failure, and RealtimeKit upstream failure.
 - Files: apps/worker/src/app.ts; apps/worker/src/app.test.ts; issue4-slices-runbook.md; context/compact-delta.md
 - Validation: Worker route/unit tests, Worker typecheck/build, frontend token/API scan, route/service token logging scan, live Wrangler create-meeting curl, and invalid-input curl passed. Live curl created a real RealtimeKit meeting; auth token was not stored in docs.
+
+## 2026-05-27 03:06 AEST
+- Issue: #4 / local slice 4D
+- Change: Replaced placeholder frontend with a create-meeting form. The UI collects display name and optional title, calls `POST /api/meetings`, handles idle/creating/created/error states, displays the returned meeting ID, and keeps the auth token only in React state for the next SDK slice.
+- Files: apps/web/src/App.tsx; apps/web/src/styles.css; issue4-slices-runbook.md; context/compact-delta.md
+- Validation: Frontend typecheck/build, Worker tests, workspace typecheck, frontend secret/API scan, RealtimeKit package absence scan, built frontend smoke, and live create-route curl passed. Live curl created a real RealtimeKit meeting; auth token was redacted and not stored in docs.
