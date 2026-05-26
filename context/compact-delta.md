@@ -93,3 +93,15 @@ Current state:
 - Change: Added the missing issue-specific create-meeting sequence diagram that should have accompanied issue #4, and linked it from README.
 - Files: docs/diagrams/issues/4-sequence.puml; docs/diagrams/issues/4-sequence.svg; README.md; context/compact-delta.md
 - Validation: `plantuml -tsvg docs/diagrams/issues/4-sequence.puml` passed.
+
+## 2026-05-27 04:25 AEST
+- Issue: #6 / local slice 6A
+- Change: Added webhook payload validation, safe metadata extraction, and bounded/redacted payload snapshot helpers. The helper accepts JSON object payloads, rejects non-object payloads, allow-lists event type, meeting ID, and timestamp metadata, and preserves sanitized payload shape for discovery because official inbound webhook payload shape is not clearly documented. No webhook route or registration path was added.
+- Files: apps/worker/package.json; apps/worker/src/schemas/webhooks.ts; apps/worker/src/webhooks.test.ts; issue6-slices-runbook.md; context/compact-delta.md
+- Validation: Worker tests passed with 38 tests; Worker typecheck/build passed; route absence, token-field, and persistence scans passed.
+
+## 2026-05-27 04:33 AEST
+- Issue: #6
+- Change: Updated the local issue #6 slice plan and GitHub issue #6 acceptance criteria to clarify webhook discovery logging: structured logs should include stable metadata plus a bounded/redacted payload snapshot, because official inbound RealtimeKit webhook payload shape is not clearly documented.
+- Files: issue6-slices.md; context/compact-delta.md; GitHub issue #6 body
+- Validation: GitHub issue #6 body updated successfully; local slice plan readback completed.

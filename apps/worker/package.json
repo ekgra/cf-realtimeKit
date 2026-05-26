@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json --noEmit",
     "dev": "pnpm --dir ../.. build:web && wrangler dev --config ../../wrangler.jsonc --local",
     "dev:worker": "pnpm dev",
-    "test": "tsx --test src/app.test.ts src/schemas.test.ts src/services/realtimekit.test.ts",
+    "test": "tsx --test src/app.test.ts src/schemas.test.ts src/services/realtimekit.test.ts src/webhooks.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
