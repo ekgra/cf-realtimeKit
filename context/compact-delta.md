@@ -51,3 +51,9 @@ Current state:
 - Change: Added Worker-side create-meeting validation primitives: required env validation for Cloudflare/RealtimKit config, Zod request schema for `displayName` and optional `title`, and safe response schema for `{ meetingId, authToken }`. No route or Cloudflare API wrapper was added.
 - Files: apps/worker/package.json; apps/worker/src/schemas/env.ts; apps/worker/src/schemas/meetings.ts; apps/worker/src/schemas.test.ts; pnpm-lock.yaml; issue4-slices-runbook.md; context/compact-delta.md
 - Validation: Worker schema tests, Worker typecheck, Worker build, frontend token/API scan, Worker scope scan, and token logging scan passed.
+
+## 2026-05-27 02:19 AEST
+- Issue: #4 / local slice 4B
+- Change: Added Worker-only RealtimeKit REST wrapper for create-meeting happy path. It creates a meeting, creates a participant with `REALTIMEKIT_PRESET_NAME`, maps Cloudflare participant `data.token` to app response `authToken`, and logs only safe structured events. No route or frontend behavior was added.
+- Files: apps/worker/package.json; apps/worker/src/services/realtimekit.ts; apps/worker/src/services/realtimekit.test.ts; issue4-slices-runbook.md; context/compact-delta.md
+- Validation: Worker tests, Worker typecheck, Worker build, frontend token/API scan, service token logging scan, and route absence scan passed.
