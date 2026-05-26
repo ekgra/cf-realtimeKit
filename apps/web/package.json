@@ -1,0 +1,11 @@
+{
+  "name": "@cf-realtimekit-demo/web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"apps/web build is added in slice 3B\"",
+    "typecheck": "tsc --showConfig -p tsconfig.json > /dev/null"
+  },
+  "devDependencies": {}
+}

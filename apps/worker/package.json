@@ -1,0 +1,11 @@
+{
+  "name": "@cf-realtimekit-demo/worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"apps/worker build is added in slice 3C\"",
+    "typecheck": "tsc --showConfig -p tsconfig.json > /dev/null"
+  },
+  "devDependencies": {}
+}
