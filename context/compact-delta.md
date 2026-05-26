@@ -39,3 +39,9 @@ Current state:
 - Change: Added `.env.example` with placeholder V1 config and documented the secret boundary. `CLOUDFLARE_API_TOKEN` is Worker/server-only; browser-exposed env prefixes such as `VITE_` must not be used for it. Local env files and Wrangler `.dev.vars` files are ignored.
 - Files: .env.example; .gitignore; README.md; issue3-slices-runbook.md; context/compact-delta.md
 - Validation: Frontend token/RealtimeKit secret scan passed; `.env.example` placeholder check passed; web and Worker typechecks passed.
+
+## 2026-05-27 01:54 AEST
+- Issue: #3 / local slice 3F
+- Change: Updated README with confirmed setup/run/validation commands and stored `test-strategy:v1` plus `slice-evidence:v1` on GitHub issue #3. Issue #3 scaffold quality gate result is PASS.
+- Files: README.md; issue3-slices-runbook.md; context/compact-delta.md
+- Validation: `corepack pnpm install`, workspace typecheck/test/build, Wrangler dry-run, local Wrangler smoke, frontend secret scan, app-code scope scan, and `.env.example` placeholder check passed. Local smoke used port `8788` because an existing Worker process was already listening on `8787`.

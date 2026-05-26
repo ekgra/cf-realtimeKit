@@ -8,16 +8,37 @@ The accepted product contract is [docs/specs/mvp/PRD.md](docs/specs/mvp/PRD.md).
 
 ## Quick Start
 
-The app scaffold is not implemented yet. Start with the accepted PRD and issue #1 baseline, then implement the scaffold in issue #3.
-
-Expected toolchain for the MVP:
+Expected local toolchain:
 
 - `pnpm`
-- `node`
-- `wrangler`
-- Cloudflare account access with RealtimeKit enabled
+- Node.js 20.x or newer
+- Wrangler, installed through the workspace dev dependency
 
-Runtime commands will be added when the pnpm workspace, Vite app, Hono Worker, and Wrangler config exist.
+Install dependencies:
+
+```sh
+corepack pnpm install
+```
+
+Run the target single Worker app shape locally:
+
+```sh
+corepack pnpm dev:worker
+```
+
+Then check:
+
+```sh
+curl -s -i http://localhost:8787/health
+```
+
+`http://localhost:8787/` serves the built Vite frontend assets. `http://localhost:8787/health` is the Worker/Hono API health route.
+
+Frontend-only Vite development is also available when API/runtime behavior is not needed:
+
+```sh
+corepack pnpm --filter @cf-realtimekit-demo/web dev
+```
 
 ## Documentation Map
 
@@ -47,6 +68,17 @@ V1 is planned as a single Cloudflare Worker app:
 - Webhook events are accepted by the Worker and logged as structured records.
 
 See the baseline architecture diagram source in [docs/diagrams/architecture.d2](docs/diagrams/architecture.d2).
+
+Current scaffold layout:
+
+```text
+apps/
+  web/       React + Vite frontend source
+  worker/    Hono Worker source and route tests
+wrangler.jsonc
+```
+
+Wrangler serves built frontend files from `apps/web/dist` and runs Worker code from `apps/worker/src/index.ts`. The configured Worker-first routes are `/health` and future `/api/*` paths.
 
 ## Core Workflows
 
@@ -110,11 +142,38 @@ Development should follow the accepted PRD and the GitHub issue sequence:
 
 Before implementation slices, store `test-strategy:v1` on the issue. During implementation, store `slice-evidence:v1` on the issue.
 
+Common commands:
+
+```sh
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm build
+corepack pnpm build:web
+corepack pnpm --filter @cf-realtimekit-demo/worker dev
+```
+
+The root `dev:worker` and filtered Worker `dev` scripts both build frontend assets before starting Wrangler on `http://localhost:8787`.
+
 ## Testing And Validation
 
-No application test commands exist yet because the app scaffold has not been created.
+Current scaffold validation commands:
 
-Expected validation layers by slice:
+```sh
+corepack pnpm typecheck
+corepack pnpm test
+corepack pnpm build
+corepack pnpm exec wrangler deploy --dry-run --outdir .wrangler/dry-run
+```
+
+Local runtime smoke:
+
+```sh
+corepack pnpm dev:worker
+curl -s -i http://localhost:8787/health
+curl -s -i http://localhost:8787/dashboard
+```
+
+Validation layers by later slice:
 
 - Documentation slices: document review and diagram render checks.
 - API/runtime slices: Zod/unit tests, mocked route tests, Worker runtime evidence, and observability evidence.
@@ -139,12 +198,10 @@ ADR candidates are listed in the PRD and should become ADRs only if implementati
 
 ## Current Status / Roadmap
 
-Current status: PRD accepted; baseline README and diagrams are established in issue #1.
+Current status: issue #3 scaffold is implemented locally and awaiting review/commit approval. The app has a pnpm workspace, Vite React frontend skeleton, Hono Worker skeleton, Wrangler static-assets config, `.env.example`, and `GET /health`.
 
 Next planned work:
 
-- Issue #2: document RealtimeKit API discovery.
-- Issue #3: scaffold the single Worker React app with health check.
 - Issue #4: implement create meeting happy path.
 - Issue #5: implement join existing meeting happy path.
 - Issue #6: implement webhook receiver and registration path.
