@@ -1,4 +1,9 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import {
+  RealtimeKitProvider,
+  useRealtimeKitClient,
+} from "@cloudflare/realtimekit-react";
+import { RtkMeeting } from "@cloudflare/realtimekit-react-ui";
 
 type CreateMeetingResponse = {
   meetingId: string;
@@ -9,9 +14,11 @@ type CreateState =
   | { status: "idle" }
   | { status: "creating" }
   | { status: "created"; meetingId: string; authToken: string }
+  | { status: "meeting"; meetingId: string; authToken: string }
   | { status: "error"; message: string };
 
 export function App() {
+  const [meeting, initMeeting] = useRealtimeKitClient();
   const [displayName, setDisplayName] = useState("");
   const [title, setTitle] = useState("");
   const [createState, setCreateState] = useState<CreateState>({
@@ -19,7 +26,52 @@ export function App() {
   });
 
   const isCreating = createState.status === "creating";
-  const meetingId = createState.status === "created" ? createState.meetingId : "";
+  const meetingId =
+    createState.status === "created" || createState.status === "meeting"
+      ? createState.meetingId
+      : "";
+
+  useEffect(() => {
+    if (createState.status !== "created") {
+      return;
+    }
+
+    let isCurrent = true;
+
+    initMeeting({ authToken: createState.authToken })
+      .then((loadedMeeting) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        if (!loadedMeeting) {
+          throw new Error("Meeting UI could not be initialized. Try again.");
+        }
+
+        setCreateState({
+          status: "meeting",
+          meetingId: createState.meetingId,
+          authToken: createState.authToken,
+        });
+      })
+      .catch((error) => {
+        if (!isCurrent) {
+          return;
+        }
+
+        setCreateState({
+          status: "error",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Meeting UI could not be initialized. Try again.",
+        });
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [createState, initMeeting]);
 
   async function handleCreateMeeting(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -122,16 +174,29 @@ export function App() {
           </p>
         ) : null}
 
-        {createState.status === "created" ? (
+        {createState.status === "created" || createState.status === "meeting" ? (
           <section className="meeting-result" aria-label="Created meeting">
             <div>
               <span>Meeting ID</span>
               <strong>{meetingId}</strong>
             </div>
-            <p>RealtimeKit UI rendering is the next slice.</p>
+            {meeting ? null : <p>Preparing meeting UI...</p>}
           </section>
         ) : null}
       </section>
+
+      {meeting ? (
+        <section className="meeting-stage" aria-label="RealtimeKit meeting">
+          <RealtimeKitProvider value={meeting}>
+            <RtkMeeting
+              leaveOnUnmount={true}
+              meeting={meeting}
+              mode="fill"
+              showSetupScreen={true}
+            />
+          </RealtimeKitProvider>
+        </section>
+      ) : null}
     </main>
   );
 }
