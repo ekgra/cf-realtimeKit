@@ -4,6 +4,8 @@ import { EnvValidationError, validateWorkerEnv } from "./schemas/env";
 import {
   createMeetingRequestSchema,
   createMeetingResponseSchema,
+  joinMeetingRequestSchema,
+  meetingIdPathSchema,
 } from "./schemas/meetings";
 
 const validEnv = {
@@ -90,4 +92,31 @@ test("createMeetingResponseSchema accepts only safe frontend response shape", ()
       authToken: "participant-token",
     },
   );
+});
+
+test("joinMeetingRequestSchema accepts and trims valid input", () => {
+  assert.deepEqual(
+    joinMeetingRequestSchema.parse({
+      displayName: " Grace ",
+    }),
+    {
+      displayName: "Grace",
+    },
+  );
+});
+
+test("joinMeetingRequestSchema rejects missing or empty displayName", () => {
+  assert.equal(joinMeetingRequestSchema.safeParse({}).success, false);
+  assert.equal(
+    joinMeetingRequestSchema.safeParse({ displayName: "   " }).success,
+    false,
+  );
+});
+
+test("meetingIdPathSchema accepts and trims a meeting ID", () => {
+  assert.equal(meetingIdPathSchema.parse(" meeting-id "), "meeting-id");
+});
+
+test("meetingIdPathSchema rejects blank meeting IDs", () => {
+  assert.equal(meetingIdPathSchema.safeParse("   ").success, false);
 });

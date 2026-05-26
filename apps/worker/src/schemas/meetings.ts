@@ -29,6 +29,26 @@ export const createMeetingRequestSchema = z
 
 export type CreateMeetingRequest = z.infer<typeof createMeetingRequestSchema>;
 
+export const joinMeetingRequestSchema = z
+  .object({
+    displayName: z
+      .string()
+      .trim()
+      .min(1, "displayName is required")
+      .max(100, "displayName must be at most 100 characters"),
+  })
+  .strict();
+
+export type JoinMeetingRequest = z.infer<typeof joinMeetingRequestSchema>;
+
+export const meetingIdPathSchema = z
+  .string()
+  .trim()
+  .min(1, "meetingId is required")
+  .max(200, "meetingId must be at most 200 characters");
+
+export type MeetingIdPath = z.infer<typeof meetingIdPathSchema>;
+
 export const createMeetingResponseSchema = z
   .object({
     meetingId: z.string().trim().min(1, "meetingId is required"),

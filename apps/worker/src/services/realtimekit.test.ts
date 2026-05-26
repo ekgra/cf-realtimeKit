@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   createRealtimeKitMeetingForCreator,
+  joinRealtimeKitMeeting,
   RealtimeKitApiError,
 } from "./realtimekit";
 import type { WorkerEnv } from "../schemas/env";
@@ -214,6 +215,123 @@ test("createRealtimeKitMeetingForCreator fails safely on unexpected token shape"
       }),
     /Unexpected RealtimeKit participant response/,
   );
+});
+
+test("joinRealtimeKitMeeting adds participant to provided meeting", async () => {
+  const calls: FetchCall[] = [];
+  const loggerRecords: Record<string, unknown>[] = [];
+  const fetcher = async (input: string, init?: RequestInit) => {
+    calls.push({ input, init });
+
+    return jsonResponse({
+      success: true,
+      data: {
+        token: "participant-token",
+      },
+    });
+  };
+
+  const result = await joinRealtimeKitMeeting({
+    env,
+    meetingId: "existing-meeting-id",
+    input: { displayName: "Grace" },
+    fetcher,
+    idFactory: () => "participant-id",
+    logger: {
+      info: (record) => loggerRecords.push(record),
+      error: (record) => loggerRecords.push(record),
+    },
+  });
+
+  assert.deepEqual(result, {
+    meetingId: "existing-meeting-id",
+    authToken: "participant-token",
+  });
+  assert.equal(calls.length, 1);
+  assert.equal(
+    calls[0]?.input,
+    "https://api.cloudflare.com/client/v4/accounts/account-id/realtime/kit/app-id/meetings/existing-meeting-id/participants",
+  );
+  assert.equal(calls[0]?.init?.method, "POST");
+  assert.deepEqual(await bodyJson(calls[0]?.init), {
+    custom_participant_id: "participant-id",
+    preset_name: "group_call_host",
+    name: "Grace",
+  });
+  assert.equal(getHeader(calls[0]?.init, "Authorization"), "Bearer server-token");
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "meeting_join_requested",
+    },
+  ]);
+});
+
+test("joinRealtimeKitMeeting URL-encodes provided meeting ID", async () => {
+  const calls: FetchCall[] = [];
+  const fetcher = async (input: string, init?: RequestInit) => {
+    calls.push({ input, init });
+
+    return jsonResponse({ success: true, data: { token: "participant-token" } });
+  };
+
+  await joinRealtimeKitMeeting({
+    env,
+    meetingId: "meeting id/with slash",
+    input: { displayName: "Grace" },
+    fetcher,
+    idFactory: () => "participant-id",
+    logger: noopLogger,
+  });
+
+  assert.equal(
+    calls[0]?.input,
+    "https://api.cloudflare.com/client/v4/accounts/account-id/realtime/kit/app-id/meetings/meeting%20id%2Fwith%20slash/participants",
+  );
+});
+
+test("joinRealtimeKitMeeting returns safe error on participant failure", async () => {
+  const loggerRecords: Record<string, unknown>[] = [];
+  const fetcher = async () =>
+    jsonResponse({ success: false, errors: [{ message: "nope" }] }, { status: 404 });
+
+  await assert.rejects(
+    () =>
+      joinRealtimeKitMeeting({
+        env,
+        meetingId: "missing-meeting",
+        input: { displayName: "Grace" },
+        fetcher,
+        idFactory: () => "participant-id",
+        logger: {
+          info: (record) => loggerRecords.push(record),
+          error: (record) => loggerRecords.push(record),
+        },
+      }),
+    (error) => {
+      assert.equal(error instanceof RealtimeKitApiError, true);
+      assert.equal(
+        (error as RealtimeKitApiError).message,
+        "Failed to create RealtimeKit participant",
+      );
+      assert.deepEqual((error as RealtimeKitApiError).details, {
+        stage: "participant",
+        status: 404,
+      });
+      assert.equal(JSON.stringify(error).includes("server-token"), false);
+      return true;
+    },
+  );
+
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "meeting_join_requested",
+    },
+    {
+      event: "cloudflare_realtimekit_request_failed",
+      stage: "participant",
+      status: 404,
+    },
+  ]);
 });
 
 async function bodyJson(init: RequestInit | undefined): Promise<unknown> {

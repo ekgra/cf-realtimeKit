@@ -71,7 +71,7 @@ h1 {
   font-size: 1.125rem;
 }
 
-.meeting-form {
+.meeting-panel {
   display: grid;
   gap: 18px;
   width: 100%;
@@ -80,6 +80,18 @@ h1 {
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 18px 40px rgb(21 31 51 / 8%);
+}
+
+.meeting-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.meeting-form {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
 }
 
 .field {
@@ -124,6 +136,18 @@ h1 {
 .primary-action:disabled {
   background: #8aa7cf;
   cursor: wait;
+}
+
+.secondary-action {
+  color: #17452d;
+  border: 1px solid #7fc19c;
+  background: #dff7e8;
+}
+
+.secondary-action:disabled {
+  color: #587064;
+  border-color: #badbcc;
+  background: #edf6f0;
 }
 
 .status {
@@ -204,10 +228,14 @@ h1 {
     font-size: 2.25rem;
   }
 
-  .meeting-form,
+  .meeting-panel,
   .status,
   .meeting-result {
     grid-column: 1;
+  }
+
+  .meeting-actions {
+    grid-template-columns: 1fr;
   }
 
   .meeting-stage {

@@ -81,3 +81,9 @@ Current state:
 - Change: Updated README and local runbook for issue #4 closure. Issue #4 create-meeting happy path now includes Worker env/body validation, Worker-only RealtimeKit REST calls, `POST /api/meetings`, React create form states, RealtimeKit SDK initialization, and `RtkMeeting` rendering. GitHub issue evidence and quality gate are being stored before closure.
 - Files: README.md; issue4-slices-runbook.md; context/compact-delta.md
 - Validation: Final validation ladder for issue #4 run before commit and close; no staging or production deploy was performed.
+
+## 2026-05-27 04:04 AEST
+- Issue: #5
+- Change: Implemented join existing meeting happy path locally. Added path/body validation for `POST /api/meetings/:meetingId/join`, Worker-only RealtimeKit participant creation for a caller-provided meeting ID, frontend join form state, and issue-specific join sequence documentation. No D1 persistence or meeting lookup was introduced.
+- Files: apps/worker/src/schemas/meetings.ts; apps/worker/src/schemas.test.ts; apps/worker/src/services/realtimekit.ts; apps/worker/src/services/realtimekit.test.ts; apps/worker/src/app.ts; apps/worker/src/app.test.ts; apps/web/src/App.tsx; apps/web/src/styles.css; README.md; docs/diagrams/issues/5-sequence.puml; docs/diagrams/issues/5-sequence.svg; context/compact-delta.md
+- Validation: Worker schema/service/route tests passed with 30 tests; workspace typecheck/build passed; Wrangler dry-run passed; secret scans passed; issue #5 sequence diagram rendered; dev-local create-then-join smoke passed with auth tokens redacted. No staging or production deploy performed.

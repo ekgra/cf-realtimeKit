@@ -3,6 +3,7 @@ import type { WorkerEnv } from "../schemas/env";
 import type {
   CreateMeetingRequest,
   CreateMeetingResponse,
+  JoinMeetingRequest,
 } from "../schemas/meetings";
 
 const CLOUDFLARE_API_BASE_URL = "https://api.cloudflare.com/client/v4";
@@ -19,6 +20,15 @@ type SafeLogger = {
 type CreateMeetingOptions = {
   env: WorkerEnv;
   input: CreateMeetingRequest;
+  fetcher?: Fetcher;
+  idFactory?: IdFactory;
+  logger?: SafeLogger;
+};
+
+type JoinMeetingOptions = {
+  env: WorkerEnv;
+  meetingId: string;
+  input: JoinMeetingRequest;
   fetcher?: Fetcher;
   idFactory?: IdFactory;
   logger?: SafeLogger;
@@ -77,6 +87,33 @@ export async function createRealtimeKitMeetingForCreator({
 
   return {
     meetingId: meeting.id,
+    authToken: participant.token,
+  };
+}
+
+export async function joinRealtimeKitMeeting({
+  env,
+  meetingId,
+  input,
+  fetcher = fetch,
+  idFactory = () => crypto.randomUUID(),
+  logger = defaultLogger,
+}: JoinMeetingOptions): Promise<CreateMeetingResponse> {
+  logger.info({
+    event: "meeting_join_requested",
+  });
+
+  const participant = await createParticipant({
+    env,
+    meetingId,
+    displayName: input.displayName,
+    customParticipantId: idFactory(),
+    fetcher,
+    logger,
+  });
+
+  return {
+    meetingId,
     authToken: participant.token,
   };
 }

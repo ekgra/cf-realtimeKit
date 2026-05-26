@@ -1,0 +1,20 @@
+@startuml
+title Issue #5 Join Existing Meeting Flow
+
+actor "Second user" as User
+participant "React/Vite frontend" as Frontend
+participant "Hono Worker API" as Worker
+participant "Cloudflare RealtimeKit API" as RealtimeKit
+participant "Workers Observability" as Observability
+
+User -> Frontend: Enter display name and meeting ID
+Frontend -> Worker: POST /api/meetings/{meetingId}/join
+Worker -> Worker: Validate meetingId path and displayName body
+Worker -> RealtimeKit: Add participant with REALTIMEKIT_PRESET_NAME
+RealtimeKit --> Worker: participant token
+Worker -> Observability: Structured join/request failure logs
+Worker --> Frontend: meetingId, authToken
+Frontend -> RealtimeKit: Initialize SDK with authToken
+Frontend --> User: Render RtkMeeting
+
+@enduml

@@ -20,7 +20,7 @@ Install dependencies:
 corepack pnpm install
 ```
 
-For create-meeting local validation, provide Worker-only values in an untracked
+For create/join local validation, provide Worker-only values in an untracked
 `.dev.vars` file. If you already maintain an untracked `.env` with the same
 keys, copy it before starting Wrangler:
 
@@ -54,6 +54,17 @@ The response is `{ "meetingId": "...", "authToken": "..." }`. Treat
 `authToken` as a participant credential: do not paste it into docs, logs, or
 issue comments.
 
+Join-meeting API smoke using the created meeting ID:
+
+```sh
+curl -s -i -X POST http://localhost:8787/api/meetings/<meeting-id>/join \
+  -H 'Content-Type: application/json' \
+  --data '{"displayName":"Second Tester"}'
+```
+
+This returns a second participant `{ "meetingId": "...", "authToken": "..." }`
+without storing or looking up meeting records in the app.
+
 Frontend-only Vite development is also available when API/runtime behavior is not needed:
 
 ```sh
@@ -68,6 +79,8 @@ corepack pnpm --filter @cf-realtimekit-demo/web dev
 - Architecture diagram SVG: [docs/diagrams/architecture.svg](docs/diagrams/architecture.svg)
 - Main sequence source: [docs/diagrams/sequences/main-flow.puml](docs/diagrams/sequences/main-flow.puml)
 - Main sequence SVG: [docs/diagrams/sequences/main-flow.svg](docs/diagrams/sequences/main-flow.svg)
+- Issue #5 join sequence source: [docs/diagrams/issues/5-sequence.puml](docs/diagrams/issues/5-sequence.puml)
+- Issue #5 join sequence SVG: [docs/diagrams/issues/5-sequence.svg](docs/diagrams/issues/5-sequence.svg)
 - ADRs: [docs/adr/](docs/adr/)
 - Local issue fallback: [docs/issues/](docs/issues/)
 
@@ -104,8 +117,9 @@ Current implemented API routes:
 
 - `GET /health`
 - `POST /api/meetings`
+- `POST /api/meetings/:meetingId/join`
 
-The frontend create flow uses `@cloudflare/realtimekit-react` and
+The frontend create and join flows use `@cloudflare/realtimekit-react` and
 `@cloudflare/realtimekit-react-ui` to initialize a RealtimeKit client with the
 participant `authToken` returned by the Worker and render `RtkMeeting`.
 
@@ -209,10 +223,9 @@ Validation layers by later slice:
 - User-visible flows: frontend build/typecheck and E2E/manual evidence as selected by `test-strategy`.
 - Release gate: staging deploy and smoke evidence unless explicitly accepted as risk.
 
-Create-meeting validation currently includes Worker schema/service/route tests
-with mocked Cloudflare API responses, frontend typecheck/build, workspace
-typecheck, secret scans, and dev-local smoke with configured RealtimeKit
-credentials.
+Create/join validation currently includes Worker schema/service/route tests with
+mocked Cloudflare API responses, frontend typecheck/build, workspace typecheck,
+secret scans, and dev-local smoke with configured RealtimeKit credentials.
 
 ## Operations
 
@@ -232,14 +245,14 @@ ADR candidates are listed in the PRD and should become ADRs only if implementati
 
 ## Current Status / Roadmap
 
-Current status: issue #4 create-meeting happy path is implemented. The app has
+Current status: issue #5 join existing meeting happy path is implemented locally. The app has
 a pnpm workspace, Vite React frontend, Hono Worker, Wrangler static-assets
-config, `.env.example`, `GET /health`, `POST /api/meetings`, a Worker-only
-RealtimeKit REST wrapper, and frontend RealtimeKit SDK/UI Kit initialization for
-newly created meetings.
+config, `.env.example`, `GET /health`, `POST /api/meetings`,
+`POST /api/meetings/:meetingId/join`, a Worker-only RealtimeKit REST wrapper,
+and frontend RealtimeKit SDK/UI Kit initialization for created or joined
+meetings.
 
 Next planned work:
 
-- Issue #5: implement join existing meeting happy path.
 - Issue #6: implement webhook receiver and registration path.
 - Issue #7: run MVP runtime validation and release gate.
