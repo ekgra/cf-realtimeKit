@@ -82,6 +82,15 @@ Authorization: Bearer <CLOUDFLARE_API_TOKEN>
 
 The token needs at least one of the documented Realtime permissions: `Realtime Admin` or `Realtime`.
 
+Why this is needed even when the backend is a Cloudflare Worker:
+
+- A Worker running on Cloudflare infrastructure is not automatically authorized to manage account-level Cloudflare resources.
+- RealtimeKit meeting and participant management is currently documented as Cloudflare REST API access, not as a Worker binding.
+- Worker bindings such as D1, Durable Objects, R2, KV, and Workers AI are a different access mode: the binding gives the Worker both the API surface and scoped permission through `env.*`.
+- Because RealtimeKit does not currently expose a Worker binding, the Worker must call the RealtimeKit REST endpoints with `CLOUDFLARE_API_TOKEN`.
+- The participant auth token returned by RealtimeKit is a separate, browser-safe credential for joining a meeting. The Worker obtains it by calling the participant endpoint with the Cloudflare API token, then returns only the participant token and meeting ID to the browser.
+- If Cloudflare later ships a RealtimeKit Worker binding, this integration boundary may change. Until then, REST API plus a scoped server-only token is the documented path.
+
 ## Meeting API Shape
 
 Create meeting:
