@@ -20,6 +20,14 @@ Install dependencies:
 corepack pnpm install
 ```
 
+For create-meeting local validation, provide Worker-only values in an untracked
+`.dev.vars` file. If you already maintain an untracked `.env` with the same
+keys, copy it before starting Wrangler:
+
+```sh
+cp .env .dev.vars
+```
+
 Run the target single Worker app shape locally:
 
 ```sh
@@ -33,6 +41,18 @@ curl -s -i http://localhost:8787/health
 ```
 
 `http://localhost:8787/` serves the built Vite frontend assets. `http://localhost:8787/health` is the Worker/Hono API health route.
+
+Create-meeting API smoke:
+
+```sh
+curl -s -i -X POST http://localhost:8787/api/meetings \
+  -H 'Content-Type: application/json' \
+  --data '{"displayName":"Local Tester","title":"Local smoke"}'
+```
+
+The response is `{ "meetingId": "...", "authToken": "..." }`. Treat
+`authToken` as a participant credential: do not paste it into docs, logs, or
+issue comments.
 
 Frontend-only Vite development is also available when API/runtime behavior is not needed:
 
@@ -79,6 +99,15 @@ wrangler.jsonc
 ```
 
 Wrangler serves built frontend files from `apps/web/dist` and runs Worker code from `apps/worker/src/index.ts`. The configured Worker-first routes are `/health` and future `/api/*` paths.
+
+Current implemented API routes:
+
+- `GET /health`
+- `POST /api/meetings`
+
+The frontend create flow uses `@cloudflare/realtimekit-react` and
+`@cloudflare/realtimekit-react-ui` to initialize a RealtimeKit client with the
+participant `authToken` returned by the Worker and render `RtkMeeting`.
 
 ## Core Workflows
 
@@ -180,6 +209,11 @@ Validation layers by later slice:
 - User-visible flows: frontend build/typecheck and E2E/manual evidence as selected by `test-strategy`.
 - Release gate: staging deploy and smoke evidence unless explicitly accepted as risk.
 
+Create-meeting validation currently includes Worker schema/service/route tests
+with mocked Cloudflare API responses, frontend typecheck/build, workspace
+typecheck, secret scans, and dev-local smoke with configured RealtimeKit
+credentials.
+
 ## Operations
 
 Use Cloudflare platform observability first. App-owned telemetry in V1 should be limited to structured logs for product-relevant stages such as meeting creation, participant join, Cloudflare API failures, and webhook receipt.
@@ -198,11 +232,14 @@ ADR candidates are listed in the PRD and should become ADRs only if implementati
 
 ## Current Status / Roadmap
 
-Current status: issue #3 scaffold is implemented locally and awaiting review/commit approval. The app has a pnpm workspace, Vite React frontend skeleton, Hono Worker skeleton, Wrangler static-assets config, `.env.example`, and `GET /health`.
+Current status: issue #4 create-meeting happy path is implemented. The app has
+a pnpm workspace, Vite React frontend, Hono Worker, Wrangler static-assets
+config, `.env.example`, `GET /health`, `POST /api/meetings`, a Worker-only
+RealtimeKit REST wrapper, and frontend RealtimeKit SDK/UI Kit initialization for
+newly created meetings.
 
 Next planned work:
 
-- Issue #4: implement create meeting happy path.
 - Issue #5: implement join existing meeting happy path.
 - Issue #6: implement webhook receiver and registration path.
 - Issue #7: run MVP runtime validation and release gate.

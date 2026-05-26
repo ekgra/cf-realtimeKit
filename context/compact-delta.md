@@ -75,3 +75,9 @@ Current state:
 - Change: Added RealtimeKit React SDK/UI Kit integration for the create-meeting flow. The frontend initializes a RealtimeKit client with the backend `authToken`, renders `RtkMeeting` after initialization, keeps the meeting ID visible, and does not display/log/persist the auth token.
 - Files: apps/web/package.json; apps/web/src/App.tsx; apps/web/src/styles.css; pnpm-lock.yaml; issue4-slices-runbook.md; context/compact-delta.md
 - Validation: Frontend typecheck/build, Worker tests, workspace typecheck, frontend secret/API scan, expected RealtimeKit package scan, built frontend smoke, and live create-route curl passed. Vite reported large chunk warnings from the UI Kit bundle. Manual browser media/device validation remains pending.
+
+## 2026-05-27 03:35 AEST
+- Issue: #4 / local slice 4F
+- Change: Updated README and local runbook for issue #4 closure. Issue #4 create-meeting happy path now includes Worker env/body validation, Worker-only RealtimeKit REST calls, `POST /api/meetings`, React create form states, RealtimeKit SDK initialization, and `RtkMeeting` rendering. GitHub issue evidence and quality gate are being stored before closure.
+- Files: README.md; issue4-slices-runbook.md; context/compact-delta.md
+- Validation: Final validation ladder for issue #4 run before commit and close; no staging or production deploy was performed.
