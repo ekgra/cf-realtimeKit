@@ -45,3 +45,9 @@ Current state:
 - Change: Updated README with confirmed setup/run/validation commands and stored `test-strategy:v1` plus `slice-evidence:v1` on GitHub issue #3. Issue #3 scaffold quality gate result is PASS.
 - Files: README.md; issue3-slices-runbook.md; context/compact-delta.md
 - Validation: `corepack pnpm install`, workspace typecheck/test/build, Wrangler dry-run, local Wrangler smoke, frontend secret scan, app-code scope scan, and `.env.example` placeholder check passed. Local smoke used port `8788` because an existing Worker process was already listening on `8787`.
+
+## 2026-05-27 02:09 AEST
+- Issue: #4 / local slice 4A
+- Change: Added Worker-side create-meeting validation primitives: required env validation for Cloudflare/RealtimKit config, Zod request schema for `displayName` and optional `title`, and safe response schema for `{ meetingId, authToken }`. No route or Cloudflare API wrapper was added.
+- Files: apps/worker/package.json; apps/worker/src/schemas/env.ts; apps/worker/src/schemas/meetings.ts; apps/worker/src/schemas.test.ts; pnpm-lock.yaml; issue4-slices-runbook.md; context/compact-delta.md
+- Validation: Worker schema tests, Worker typecheck, Worker build, frontend token/API scan, Worker scope scan, and token logging scan passed.
