@@ -57,3 +57,9 @@ Current state:
 - Change: Added Worker-only RealtimeKit REST wrapper for create-meeting happy path. It creates a meeting, creates a participant with `REALTIMEKIT_PRESET_NAME`, maps Cloudflare participant `data.token` to app response `authToken`, and logs only safe structured events. No route or frontend behavior was added.
 - Files: apps/worker/package.json; apps/worker/src/services/realtimekit.ts; apps/worker/src/services/realtimekit.test.ts; issue4-slices-runbook.md; context/compact-delta.md
 - Validation: Worker tests, Worker typecheck, Worker build, frontend token/API scan, service token logging scan, and route absence scan passed.
+
+## 2026-05-27 02:50 AEST
+- Issue: #4 / local slice 4C
+- Change: Added `POST /api/meetings` Hono route. The route validates JSON/body and Worker env, calls the RealtimeKit wrapper, returns only `{ meetingId, authToken }`, and uses safe errors for invalid input, config failure, and RealtimeKit upstream failure.
+- Files: apps/worker/src/app.ts; apps/worker/src/app.test.ts; issue4-slices-runbook.md; context/compact-delta.md
+- Validation: Worker route/unit tests, Worker typecheck/build, frontend token/API scan, route/service token logging scan, live Wrangler create-meeting curl, and invalid-input curl passed. Live curl created a real RealtimeKit meeting; auth token was not stored in docs.
