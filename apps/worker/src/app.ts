@@ -6,6 +6,11 @@ import {
   meetingIdPathSchema,
 } from "./schemas/meetings";
 import {
+  extractSafeWebhookMetadata,
+  realtimeKitWebhookPayloadSchema,
+  sanitizeWebhookPayloadForLog,
+} from "./schemas/webhooks";
+import {
   createRealtimeKitMeetingForCreator,
   joinRealtimeKitMeeting,
   RealtimeKitApiError,
@@ -20,15 +25,26 @@ type Bindings = {
 
 type CreateMeetingService = typeof createRealtimeKitMeetingForCreator;
 type JoinMeetingService = typeof joinRealtimeKitMeeting;
+type SafeLogger = {
+  info: (record: Record<string, unknown>) => void;
+  error: (record: Record<string, unknown>) => void;
+};
 
 type AppDependencies = {
   createMeetingForCreator?: CreateMeetingService;
   joinMeeting?: JoinMeetingService;
+  logger?: SafeLogger;
+};
+
+const defaultLogger: SafeLogger = {
+  info: (record) => console.info(JSON.stringify(record)),
+  error: (record) => console.error(JSON.stringify(record)),
 };
 
 export function createApp({
   createMeetingForCreator = createRealtimeKitMeetingForCreator,
   joinMeeting = joinRealtimeKitMeeting,
+  logger = defaultLogger,
 }: AppDependencies = {}) {
   const app = new Hono<{ Bindings: Bindings }>();
 
@@ -139,6 +155,47 @@ export function createApp({
         500,
       );
     }
+  });
+
+  app.post("/api/realtimekit/webhook", async (context) => {
+    const body = await readJsonBody(context.req.raw);
+    const parsedBody = realtimeKitWebhookPayloadSchema.safeParse(body);
+
+    if (!parsedBody.success) {
+      logger.error({
+        event: "realtimekit_webhook_rejected",
+        status: "invalid_payload",
+      });
+
+      return context.json(
+        {
+          error: {
+            code: "invalid_webhook_payload",
+            message: "Webhook payload must be a JSON object.",
+          },
+        },
+        400,
+      );
+    }
+
+    /*
+      TODO: Implement RealtimeKit webhook signature verification if official
+      docs publish clear headers and algorithm. Current docs inspected for V1
+      do not clearly document signature verification.
+    */
+    const metadata = extractSafeWebhookMetadata(parsedBody.data);
+    const payload = sanitizeWebhookPayloadForLog(parsedBody.data);
+
+    logger.info({
+      event: "realtimekit_webhook_received",
+      status: "accepted",
+      ...metadata,
+      payload,
+    });
+
+    return context.json({
+      ok: true,
+    });
   });
 
   return app;

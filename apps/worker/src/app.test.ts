@@ -325,3 +325,137 @@ test("POST /api/meetings/:meetingId/join returns safe upstream failure", async (
     },
   });
 });
+
+test("POST /api/realtimekit/webhook accepts representative payload and logs safely", async () => {
+  const loggerRecords: Record<string, unknown>[] = [];
+  const app = createApp({
+    logger: {
+      info: (record) => loggerRecords.push(record),
+      error: (record) => loggerRecords.push(record),
+    },
+  });
+
+  const response = await app.request("/api/realtimekit/webhook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      event: "meeting.ended",
+      meeting_id: "meeting-id",
+      timestamp: "2026-05-27T00:00:00.000Z",
+      token: "participant-token",
+      nested: {
+        authorization: "Bearer server-token",
+        status: "ended",
+      },
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    ok: true,
+  });
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "realtimekit_webhook_received",
+      status: "accepted",
+      eventType: "meeting.ended",
+      meetingId: "meeting-id",
+      timestamp: "2026-05-27T00:00:00.000Z",
+      payload: {
+        event: "meeting.ended",
+        meeting_id: "meeting-id",
+        timestamp: "2026-05-27T00:00:00.000Z",
+        token: "[redacted]",
+        nested: {
+          authorization: "[redacted]",
+          status: "ended",
+        },
+      },
+    },
+  ]);
+  assert.equal(JSON.stringify(loggerRecords).includes("participant-token"), false);
+  assert.equal(JSON.stringify(loggerRecords).includes("server-token"), false);
+});
+
+test("POST /api/realtimekit/webhook accepts unknown object payload shape", async () => {
+  const loggerRecords: Record<string, unknown>[] = [];
+  const app = createApp({
+    logger: {
+      info: (record) => loggerRecords.push(record),
+      error: (record) => loggerRecords.push(record),
+    },
+  });
+
+  const response = await app.request("/api/realtimekit/webhook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      arbitrary: "value",
+    }),
+  });
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "realtimekit_webhook_received",
+      status: "accepted",
+      payload: {
+        arbitrary: "value",
+      },
+    },
+  ]);
+});
+
+test("POST /api/realtimekit/webhook rejects invalid JSON safely", async () => {
+  const loggerRecords: Record<string, unknown>[] = [];
+  const app = createApp({
+    logger: {
+      info: (record) => loggerRecords.push(record),
+      error: (record) => loggerRecords.push(record),
+    },
+  });
+
+  const response = await app.request("/api/realtimekit/webhook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: "{",
+  });
+
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), {
+    error: {
+      code: "invalid_webhook_payload",
+      message: "Webhook payload must be a JSON object.",
+    },
+  });
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "realtimekit_webhook_rejected",
+      status: "invalid_payload",
+    },
+  ]);
+});
+
+test("POST /api/realtimekit/webhook rejects non-object JSON safely", async () => {
+  const loggerRecords: Record<string, unknown>[] = [];
+  const app = createApp({
+    logger: {
+      info: (record) => loggerRecords.push(record),
+      error: (record) => loggerRecords.push(record),
+    },
+  });
+
+  const response = await app.request("/api/realtimekit/webhook", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(["meeting.ended"]),
+  });
+
+  assert.equal(response.status, 400);
+  assert.deepEqual(loggerRecords, [
+    {
+      event: "realtimekit_webhook_rejected",
+      status: "invalid_payload",
+    },
+  ]);
+});

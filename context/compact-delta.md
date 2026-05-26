@@ -105,3 +105,9 @@ Current state:
 - Change: Updated the local issue #6 slice plan and GitHub issue #6 acceptance criteria to clarify webhook discovery logging: structured logs should include stable metadata plus a bounded/redacted payload snapshot, because official inbound RealtimeKit webhook payload shape is not clearly documented.
 - Files: issue6-slices.md; context/compact-delta.md; GitHub issue #6 body
 - Validation: GitHub issue #6 body updated successfully; local slice plan readback completed.
+
+## 2026-05-27 05:11 AEST
+- Issue: #6 / local slice 6B
+- Change: Added `POST /api/realtimekit/webhook`. The route accepts JSON object payloads, logs stable metadata plus bounded/redacted payload snapshots, rejects invalid or non-object JSON safely, and includes a TODO for signature verification pending clear official docs. No registration path or persistence was added.
+- Files: apps/worker/src/app.ts; apps/worker/src/app.test.ts; issue6-slices-runbook.md; context/compact-delta.md
+- Validation: Worker tests passed with 42 tests; Worker typecheck/build passed; implementation token logging and persistence scans passed; dev-local accepted/rejected webhook curl smoke passed with credentials redacted in logs.
