@@ -111,3 +111,21 @@ Current state:
 - Change: Added `POST /api/realtimekit/webhook`. The route accepts JSON object payloads, logs stable metadata plus bounded/redacted payload snapshots, rejects invalid or non-object JSON safely, and includes a TODO for signature verification pending clear official docs. No registration path or persistence was added.
 - Files: apps/worker/src/app.ts; apps/worker/src/app.test.ts; issue6-slices-runbook.md; context/compact-delta.md
 - Validation: Worker tests passed with 42 tests; Worker typecheck/build passed; implementation token logging and persistence scans passed; dev-local accepted/rejected webhook curl smoke passed with credentials redacted in logs.
+
+## 2026-05-27 05:24 AEST
+- Issue: #6 / local slice 6C
+- Change: Added a safe webhook registration script for `meeting.ended`. The script builds the documented RealtimeKit webhooks API request from environment variables, defaults to dry-run, requires `--apply` for live registration, and avoids printing the Cloudflare API token. README now documents dry-run/apply usage and the need for a public webhook URL.
+- Files: scripts/register-realtimekit-webhook.mjs; package.json; README.md; issue6-slices-runbook.md; context/compact-delta.md
+- Validation: Dry-run with placeholder env values passed; script syntax check passed; token logging scan passed; workspace typecheck/build passed. No live webhook registration, staging deploy, or production deploy performed.
+
+## 2026-05-27 05:38 AEST
+- Issue: #6 / staging deploy
+- Change: Added a Wrangler `staging` environment named `cf-realtimekit-demo-staging` and deployed the current Worker/static assets to Workers.dev at `https://cf-realtimekit-demo-staging.gaurkuber.workers.dev`. Staging secrets were uploaded from local `.env`; production was not touched.
+- Files: wrangler.jsonc; context/compact-delta.md
+- Validation: Workspace tests passed with 42 tests; workspace typecheck/build passed; staging dry-run passed; staging deploy succeeded with version `6b8e3ad0-1496-435e-9bbb-98ddf0aad9e0`; staging `/health`, `/`, and webhook receiver smoke passed. Staging create-meeting smoke returned safe `502`; Worker tail showed RealtimeKit API `401` at meeting creation while the same local `.env` token succeeded via direct local curl, suggesting a deployed-runtime token restriction/scope issue such as API token IP/network restrictions. No webhook registration, staging create/join PASS, or production deploy performed.
+
+## 2026-05-27 04:56 AEST
+- Issue: #6 / staging webhook discovery
+- Change: Captured and explained real staging RealtimeKit webhook logs. The observed request included `dyte-signature`, `dyte-uuid`, and `dyte-webhook-id` headers; the app log accepted `event: meeting.ended`; the observed payload nests meeting details under `meeting`, with `meeting.id`, `meeting.sessionId`, `meeting.endedAt`, and top-level `reason`. `meeting.status` remained `LIVE` in the ended event, so future extraction should treat `event` and `meeting.endedAt` as stronger ended signals than status.
+- Files: webhook-log-explanation.md; context/compact-delta.md
+- Validation: Documentation-only readback pending; raw signature/token values were not copied into the repo note.
