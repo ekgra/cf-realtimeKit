@@ -4,8 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "echo \"apps/worker build is added in slice 3C\"",
-    "typecheck": "tsc --showConfig -p tsconfig.json > /dev/null"
+    "build": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test src/app.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "hono": "^4.10.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "tsx": "^4.21.0"
+  }
 }
